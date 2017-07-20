@@ -137,22 +137,6 @@ const CalendarHeader = createReactClass({
       );
     }
 
-    /*
-    Form inline>
-      <FormGroup id="lol">
-        <ControlLabel>{this.props.monthLabels[this.props.displayDate.getMonth()]}</ControlLabel>
-        <FormControl
-          componentClass="select"
-          value={this.props.displayDate.getFullYear()}
-          onChange={this.handleYearChange}
-          bsSize="small"
-          style={{ appearance: 'none' }}
-        >
-          {yearOptions}
-        </FormControl>
-      </FormGroup>
-    </Form>*/
-
     return <div className="text-center">
       <div className="text-muted pull-left datepicker-previous-wrapper" onClick={this.handleClickPrevious} style={{cursor: 'pointer'}}>
         {this.displayingMinMonth() ? null : this.props.previousButtonElement}
