@@ -29,6 +29,7 @@ const CalendarHeader = createReactClass({
       PropTypes.string,
       PropTypes.object
     ]).isRequired,
+    quickYearChange: PropTypes.bool,
   },
 
   displayingMinMonth() {
@@ -61,12 +62,102 @@ const CalendarHeader = createReactClass({
     this.props.onChange(newDisplayDate);
   },
 
+  handleYearChange(event) {
+    const newDisplayDate = new Date(this.props.displayDate);
+    newDisplayDate.setFullYear(event.target.value);
+
+    if (this.props.minDate && newDisplayDate.getTime() < new Date(this.props.minDate).getTime()) {
+      return this.props.onChange(new Date(this.props.minDate));
+    }
+
+    if (this.props.maxDate && newDisplayDate.getTime() > new Date(this.props.maxDate).getTime()) {
+      return this.props.onChange(new Date(this.props.maxDate));
+    }
+
+    this.props.onChange(newDisplayDate);
+  },
+
   render() {
+
+    let title;
+
+    if (this.props.quickYearChange) {
+      const today = new Date();
+
+      let startYear;
+      let endYear;
+
+      if (this.props.minDate) {
+        startYear = new Date(this.props.minDate);
+      } else {
+        startYear = new Date();
+        startYear.setFullYear(today.getFullYear() - 100);
+      }
+
+      if (this.props.maxDate) {
+        endYear = new Date(this.props.maxDate);
+      } else {
+        endYear = new Date();
+        endYear.setFullYear(today.getFullYear() + 100);
+      }
+
+      const yearOptions = [];
+      for (let i = startYear.getFullYear(); i <= endYear.getFullYear(); i++) {
+        yearOptions.push(<option key={i} value={i}>{i}</option>);
+      }
+
+      title = (
+        <div style={{display: 'inline-block'}}>
+          <label htmlFor="year">{this.props.monthLabels[this.props.displayDate.getMonth()]}</label>
+            <FormControl
+              componentClass="select"
+              value={this.props.displayDate.getFullYear()}
+              onChange={this.handleYearChange}
+              //bsSize="small"
+              style={{
+                display: 'inline-block',
+                border: 'none',
+                width: '80px',
+                float: 'none',
+                backgroundColor: 'inherit',
+                height: '20px',
+                paddingTop: '0',
+                paddingBottom: '0',
+              }}
+            >
+              {yearOptions}
+            </FormControl>
+        </div>
+      );
+    } else {
+      title = (
+        <span>
+          {this.props.monthLabels[this.props.displayDate.getMonth()]} {this.props.displayDate.getFullYear()}
+        </span>
+      );
+    }
+
+    /*
+    Form inline>
+      <FormGroup id="lol">
+        <ControlLabel>{this.props.monthLabels[this.props.displayDate.getMonth()]}</ControlLabel>
+        <FormControl
+          componentClass="select"
+          value={this.props.displayDate.getFullYear()}
+          onChange={this.handleYearChange}
+          bsSize="small"
+          style={{ appearance: 'none' }}
+        >
+          {yearOptions}
+        </FormControl>
+      </FormGroup>
+    </Form>*/
+
     return <div className="text-center">
       <div className="text-muted pull-left datepicker-previous-wrapper" onClick={this.handleClickPrevious} style={{cursor: 'pointer'}}>
         {this.displayingMinMonth() ? null : this.props.previousButtonElement}
       </div>
-      <span>{this.props.monthLabels[this.props.displayDate.getMonth()]} {this.props.displayDate.getFullYear()}</span>
+      {title}
       <div className="text-muted pull-right datepicker-next-wrapper" onClick={this.handleClickNext} style={{cursor: 'pointer'}}>
         {this.displayingMaxMonth() ? null : this.props.nextButtonElement}
       </div>
@@ -306,7 +397,8 @@ export default createReactClass({
 
     ]),
     onInvalid: PropTypes.func,
-    noValidate: PropTypes.bool
+    noValidate: PropTypes.bool,
+    quickYearChange: PropTypes.bool,
   },
 
   getDefaultProps() {
@@ -335,7 +427,8 @@ export default createReactClass({
         width: '100%'
       },
       roundedCorners: false,
-      noValidate: false
+      noValidate: false,
+      quickYearChange: false,
     };
   },
 
@@ -636,7 +729,8 @@ export default createReactClass({
       maxDate={this.props.maxDate}
       onChange={this.onChangeMonth}
       monthLabels={this.props.monthLabels}
-      dateFormat={this.props.dateFormat} />;
+      dateFormat={this.props.dateFormat}
+      quickYearChange={this.props.quickYearChange} />;
 
     const control = this.props.customControl
       ? React.cloneElement(this.props.customControl, {
